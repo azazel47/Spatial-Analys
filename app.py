@@ -17,6 +17,8 @@ if not os.path.exists(SHAPEFILE_DIR):
 else:
     try:
         gdf_tataruang = gpd.read_file(SHAPEFILE_DIR)
+        if gdf_tataruang.crs is None:
+            gdf_tataruang.set_crs("EPSG:4326", inplace=True)
         atribut_list = list(gdf_tataruang.columns)
         atribut_overlay = st.sidebar.selectbox("Pilih atribut untuk overlay:", atribut_list)
         st.success("Shapefile tata ruang berhasil dimuat dari repository.")
@@ -40,7 +42,8 @@ if excel_file and gdf_tataruang is not None:
             gdf_excel = gpd.GeoDataFrame(df_excel, geometry=geometry, crs="EPSG:4326")
 
             # Pastikan CRS sama
-            gdf_tataruang = gdf_tataruang.to_crs("EPSG:4326")
+            if gdf_tataruang.crs != gdf_excel.crs:
+                gdf_tataruang = gdf_tataruang.to_crs(gdf_excel.crs)
 
             # Lakukan spatial join
             join_result = gpd.sjoin(gdf_excel, gdf_tataruang, how="left", predicate="within")
