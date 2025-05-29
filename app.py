@@ -3,6 +3,7 @@ import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
 import folium
+from folium.plugins import MarkerCluster
 from streamlit_folium import st_folium
 import os
 
@@ -52,9 +53,11 @@ if excel_file and gdf_tataruang is not None:
             st.subheader("🗺️ Peta Overlay")
             m = folium.Map(location=[df_excel.lintang.mean(), df_excel.bujur.mean()], zoom_start=10)
             folium.GeoJson(gdf_tataruang).add_to(m)
+
+            marker_cluster = MarkerCluster().add_to(m)
             for _, row in hasil.iterrows():
                 popup = f"ID: {row['id']}<br>{atribut_overlay}: {row[atribut_overlay]}"
-                folium.Marker([row["lintang"], row["bujur"]], popup=popup).add_to(m)
+                folium.Marker([row["lintang"], row["bujur"]], popup=popup).add_to(marker_cluster)
 
             st_data = st_folium(m, width=900, height=500)
 
